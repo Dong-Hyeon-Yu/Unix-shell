@@ -1,8 +1,8 @@
 # myShell 프로젝트
 
-**제출일** : 2021-12-12
+  **제출일** : 2021-12-12
 
-                                                                                                    **유동현**(12171652)
+  **유동현** (12171652)
 
 # 1. **요구사항 정의**
 
@@ -25,6 +25,7 @@
 # 2. 구현방법
 
 ![시그널 처리 완료했을 때의 main 코드](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/5bb1ea81-6cc3-4a01-b6f7-4405aa7f29e5/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2021-11-16_21-32-07.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183040Z&X-Amz-Expires=86400&X-Amz-Signature=5491085b0f4c0376dc3bb42537e1857856f964ac0a4a9609c0cc75c32c313952&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7%252C%25202021-11-16%252021-32-07.png%22&x-id=GetObject)
+
 [시그널 처리 완료했을 때의 main 코드]
 
 ---
@@ -71,6 +72,7 @@
     : foreground process 가 정상 종료되어 main:110 waitpid() 에 의해 처리되는 경우를 제외하면, 모두 SIGCHLD handler 에 의해 처리됩니다. 즉, background & interrupted foreground 프로세스들이 해당됩니다. SIGCHLD를 처리하면서 가장 중요하게 생각했던 점은 main:75에서 `sa_restart` flag를 설정한 것입니다. 그 이유는 아래와 같습니다.
 
 ![sa_restart를 설정하지 않았을 때, myshell 프롬프트가 두번 연속으로 출력되는 것을 볼 수 있음.](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/7fabffc7-7d57-475b-8e1a-19175ab249dc/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2021-11-16_22-45-14.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183239Z&X-Amz-Expires=86400&X-Amz-Signature=875e54f90f5ff2734f6b676ef68e72fcb022ab5efe69c9e462e8ec44169bd73d&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7%252C%25202021-11-16%252022-45-14.png%22&x-id=GetObject)
+
 [sa_restart를 설정하지 않았을 때, myshell 프롬프트가 두번 연속으로 출력되는 것을 볼 수 있음.]
 
     - (1) 쉘은 background 프로세스의 SIGCHLD 에 영향을 받으면 안됩니다. 만약 main:84 fgets() 가 대기하던 중 SIGCHLD 가 발생하면, read system call 이 종료되고 다시 while 처음으로 돌아가서 쉘 프롬프트를 한번 더 출력하게 됩니다. 이는 사용자에게 생뚱맞은 프롬프트 출력으로 보입니다. 따라서 fgets() 가 시그널에 의해 종료되었을 때, 다시 시작하도록 handler flag 에 `sa_restart` 를 설정해주었습니다.
@@ -88,21 +90,25 @@
 ### 6) Redirection 구현
 
 ![[main 함수] redirection 을 위해 271-278 라인이 추가됨.](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/3fba14e8-1507-4c0c-9d5f-6d767bc18402/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2021-12-12_02-34-58.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183315Z&X-Amz-Expires=86400&X-Amz-Signature=16f7c9c58fb119ecc7c693d5ac1d2f1c4c59af0805f86d675f6c73901474ff95&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7%252C%25202021-12-12%252002-34-58.png%22&x-id=GetObject)
+
 [[main 함수] redirection 을 위해 271-278 라인이 추가됨.]
 
  기본적인 pipe가 없는 형태의 redirection을 먼저 구현했습니다. 기존의 `cmdvector` 에서 redirection character 가 존재하면 redirection을 만들어주었습니다. 쉘 프로세스의 `stdout` 과 `stdin` 의 file descripter 는 변경되면 안되므로, 위의 작업은 fork된 자식 프로세스에서 진행하였습니다.
 
 ![redirection 이 존재하는지 검사하는 함수. 개수를 반환한다.](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/c501dc28-7157-4ee9-8d13-b70ba7f8d364/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2021-12-12_02-13-57.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183336Z&X-Amz-Expires=86400&X-Amz-Signature=eef17b6c6357cdf85b51171fb4aa6db0f206f18f4c93df08ed094e0b6807893d&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7%252C%25202021-12-12%252002-13-57.png%22&x-id=GetObject)
+
 [redirection 이 존재하는지 검사하는 함수. 개수를 반환한다.]
 
  redirection character 가 존재하는지 검사하는 함수입니다. `mode` 에는 `"<"`, `">"` 둘 중 하나가 선택됩니다. 해당 문자를 cmdvector 에서 발견하면 인덱스를 반환합니다. 인덱스는 redirection을 만드는 함수에게 전달되어 파일 이름을 추출한 후, 해당 문자와 파일 이름을 `cmdvector`에서 제거할 때 사용됩니다.
 
 ![redirection 을 만드는 함수](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/e0852468-409f-4083-8f03-68beef9ca345/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2021-12-12_02-17-06.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183341Z&X-Amz-Expires=86400&X-Amz-Signature=3488a773a839994c24afea3c99d1bcf14b27b1a486fba0467f127f6963bd7715&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7%252C%25202021-12-12%252002-17-06.png%22&x-id=GetObject)
+
 [redirection 을 만드는 함수]
 
   `cmdvector` 에서 파일 이름을 찾아서 해당 파일을 open 한 후에, `"<"` 또는 `">"` 문자에 맞추어 적절히 redirection 을 만들어 줍니다. redirection 을 성공적으로 만든 후에는 해당 파일 descripter를 닫고, `cmdvector` 에서 파일 이름과 `"<"` 또는 `">"`을 지웁니다.
 
 ![redirection character 와 filename 을 지우는 함수](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/979801e2-4d16-4837-bf0f-19e9be584091/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2021-12-12_02-17-15.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183344Z&X-Amz-Expires=86400&X-Amz-Signature=998b9558dbe1b5055f7e361f89fea170c52b514b3bcde28e3667e1d3356e97dc&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7%252C%25202021-12-12%252002-17-15.png%22&x-id=GetObject)
+
 [redirection character 와 filename 을 지우는 함수]
 
   
@@ -112,12 +118,15 @@
 ### 7) Pipe 구현
 
 ![파이프 문자 개수만큼 파이프를 생성. 위처럼 파이프를 사용.](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/ccdeecad-cd9b-4c99-8a19-81b8a440b96d/ds.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183346Z&X-Amz-Expires=86400&X-Amz-Signature=66e3895bf8b6284cdb5f74e7efdd81ccf918279d8b1759681c47b59686af8f55&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22ds.png%22&x-id=GetObject)
+
 [파이프 문자 개수만큼 파이프를 생성. 위처럼 파이프를 사용.]
 
 ![[main 함수] pipe를 위해 265-269 라인이 추가됨. doPipe() 함수가 핵심.](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/3fba14e8-1507-4c0c-9d5f-6d767bc18402/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2021-12-12_02-34-58.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183348Z&X-Amz-Expires=86400&X-Amz-Signature=df8fcab20d29442aafa1286f4445e1ece645bb0388e16737db5020a3504d44b0&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7%252C%25202021-12-12%252002-34-58.png%22&x-id=GetObject)
+
 [[main 함수] pipe를 위해 265-269 라인이 추가됨. doPipe() 함수가 핵심.]
 
 ![파이프 문자의 개수를 반환한다.](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/bb6d9b91-4df6-4307-bd5d-d479f0bdb2c5/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2021-12-12_02-14-08.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20211211%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211211T183351Z&X-Amz-Expires=86400&X-Amz-Signature=a671bb222397673e8ded977f2a6450c152267f4896bb57b123832530d10f4cea&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22%25EC%258A%25A4%25ED%2581%25AC%25EB%25A6%25B0%25EC%2583%25B7%252C%25202021-12-12%252002-14-08.png%22&x-id=GetObject)
+
 [파이프 문자의 개수를 반환한다.]
 
  `cmdvector` 에서 pipe 문자의 개수를 세고, pipe 가 있으면 child에게 `doPipe()`를 실행시킨다. 쉘은 자식 프로세스가 성공적으로 파이프 명령들을 수행하기를 기다린다. (백그라운드 실행일 때는 예외)
