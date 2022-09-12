@@ -1,3 +1,7 @@
+> 그림이 종종 깨지는 관계로, [노션 링크](https://fragrant-comfort-49c.notion.site/myShell-3e058c0856d448e8af7dbcbc09f10fe1) 첨부
+
+---
+
 # myShell 프로젝트
 
   **제출일** : 2021-12-12
